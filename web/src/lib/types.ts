@@ -165,6 +165,7 @@ export interface IndexAttemptSnapshot {
   id: number;
   status: ValidStatuses | null;
   new_docs_indexed: number;
+  docs_removed_from_index: number;
   total_docs_indexed: number;
   error_msg: string | null;
   full_exception_trace: string | null;
@@ -189,6 +190,12 @@ export interface ConnectorIndexingStatus<
   latest_index_attempt: IndexAttemptSnapshot | null;
   deletion_attempt: DeletionAttemptSnapshot | null;
   is_deletable: boolean;
+}
+
+export interface CCPairBasicInfo {
+  docs_indexed: number;
+  has_successful_run: boolean;
+  source: ValidSources;
 }
 
 // CREDENTIALS
@@ -226,6 +233,10 @@ export interface ConfluenceCredentialJson {
 
 export interface JiraCredentialJson {
   jira_user_email: string;
+  jira_api_token: string;
+}
+
+export interface JiraServerCredentialJson {
   jira_api_token: string;
 }
 

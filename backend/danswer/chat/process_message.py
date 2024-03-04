@@ -26,8 +26,7 @@ from danswer.configs.chat_configs import CHAT_TARGET_CHUNK_PERCENTAGE
 from danswer.configs.chat_configs import MAX_CHUNKS_FED_TO_CHAT
 from danswer.configs.constants import DISABLED_GEN_AI_MSG
 from danswer.configs.constants import MessageType
-from danswer.configs.model_configs import CHUNK_SIZE
-from danswer.configs.model_configs import GEN_AI_MODEL_VERSION
+from danswer.configs.model_configs import DOC_EMBEDDING_CONTEXT_SIZE
 from danswer.db.chat import create_db_search_doc
 from danswer.db.chat import create_new_chat_message
 from danswer.db.chat import get_chat_message
@@ -48,6 +47,7 @@ from danswer.llm.exceptions import GenAIDisabledException
 from danswer.llm.factory import get_default_llm
 from danswer.llm.interfaces import LLM
 from danswer.llm.utils import get_default_llm_tokenizer
+from danswer.llm.utils import get_default_llm_version
 from danswer.llm.utils import get_max_input_tokens
 from danswer.llm.utils import tokenizer_trim_content
 from danswer.llm.utils import translate_history_to_basemessages
@@ -59,6 +59,7 @@ from danswer.search.search_runner import full_chunk_search_generator
 from danswer.search.search_runner import inference_documents_from_ids
 from danswer.secondary_llm_flows.choose_search import check_if_need_search
 from danswer.secondary_llm_flows.query_expansion import history_based_query_rephrase
+from danswer.server.query_and_chat.models import ChatMessageDetail
 from danswer.server.query_and_chat.models import CreateChatMessageRequest
 from danswer.server.utils import get_json_line
 from danswer.utils.logger import setup_logger
@@ -153,18 +154,24 @@ def translate_citations(
     return citation_to_saved_doc_id_map
 
 
-@log_generator_function_time()
-def stream_chat_message(
+def stream_chat_message_objects(
     new_msg_req: CreateChatMessageRequest,
     user: User | None,
     db_session: Session,
     # Needed to translate persona num_chunks to tokens to the LLM
     default_num_chunks: float = MAX_CHUNKS_FED_TO_CHAT,
-    default_chunk_size: int = CHUNK_SIZE,
+    default_chunk_size: int = DOC_EMBEDDING_CONTEXT_SIZE,
     # For flow with search, don't include as many chunks as possible since we need to leave space
     # for the chat history, for smaller models, we likely won't get MAX_CHUNKS_FED_TO_CHAT chunks
     max_document_percentage: float = CHAT_TARGET_CHUNK_PERCENTAGE,
-) -> Iterator[str]:
+) -> Iterator[
+    StreamingError
+    | QADocsResponse
+    | LLMRelevanceFilterResponse
+    | ChatMessageDetail
+    | DanswerAnswerPiece
+    | CitationInfo
+]:
     """Streams in order:
     1. [conditional] Retrieved documents if a search needs to be run
     2. [conditional] LLM selected chunk indices if LLM chunk filtering is turned on
@@ -184,11 +191,15 @@ def stream_chat_message(
         message_text = new_msg_req.message
         chat_session_id = new_msg_req.chat_session_id
         parent_id = new_msg_req.parent_message_id
-        prompt_id = new_msg_req.prompt_id
         reference_doc_ids = new_msg_req.search_doc_ids
         retrieval_options = new_msg_req.retrieval_options
         persona = chat_session.persona
         query_override = new_msg_req.query_override
+
+        # After this section, no_ai_answer is represented by prompt being None
+        prompt_id = new_msg_req.prompt_id
+        if prompt_id is None and persona.prompts and not new_msg_req.no_ai_answer:
+            prompt_id = sorted(persona.prompts, key=lambda x: x.id)[-1].id
 
         if reference_doc_ids is None and retrieval_options is None:
             raise RuntimeError(
@@ -313,10 +324,8 @@ def stream_chat_message(
                 # only allow the final document to get truncated
                 # if more than that, then the user message is too long
                 if final_doc_ind != len(tokens_per_doc) - 1:
-                    yield get_json_line(
-                        StreamingError(
-                            error="LLM context window exceeded. Please de-select some documents or shorten your query."
-                        ).dict()
+                    yield StreamingError(
+                        error="LLM context window exceeded. Please de-select some documents or shorten your query."
                     )
                     return
 
@@ -417,8 +426,8 @@ def stream_chat_message(
                 applied_source_filters=retrieval_request.filters.source_type,
                 applied_time_cutoff=time_cutoff,
                 recency_bias_multiplier=recency_bias_multiplier,
-            ).dict()
-            yield get_json_line(initial_response)
+            )
+            yield initial_response
 
             # Get the final ordering of chunks for the LLM call
             llm_chunk_selection = cast(list[bool], next(documents_generator))
@@ -430,8 +439,8 @@ def stream_chat_message(
                 ]
                 if run_llm_chunk_filter
                 else []
-            ).dict()
-            yield get_json_line(llm_relevance_filtering_response)
+            )
+            yield llm_relevance_filtering_response
 
             # Prep chunks to pass to LLM
             num_llm_chunks = (
@@ -440,7 +449,7 @@ def stream_chat_message(
                 else default_num_chunks
             )
 
-            llm_name = GEN_AI_MODEL_VERSION
+            llm_name = get_default_llm_version()[0]
             if persona.llm_model_version_override:
                 llm_name = persona.llm_model_version_override
 
@@ -459,6 +468,7 @@ def stream_chat_message(
                 chunks=top_chunks,
                 llm_chunk_selection=llm_chunk_selection,
                 token_limit=chunk_token_limit,
+                llm_tokenizer=llm_tokenizer,
             )
             llm_chunks = [top_chunks[i] for i in llm_chunks_indices]
             llm_docs = [llm_doc_from_inference_chunk(chunk) for chunk in llm_chunks]
@@ -497,7 +507,7 @@ def stream_chat_message(
                 gen_ai_response_message
             )
 
-            yield get_json_line(msg_detail_response.dict())
+            yield msg_detail_response
 
             # Stop here after saving message details, the above still needs to be sent for the
             # message id to send the next follow-up message
@@ -530,17 +540,13 @@ def stream_chat_message(
                 citations.append(packet)
                 continue
 
-            yield get_json_line(packet.dict())
+            yield packet
     except Exception as e:
         logger.exception(e)
 
         # Frontend will erase whatever answer and show this instead
         # This will be the issue 99% of the time
-        error_packet = StreamingError(
-            error="LLM failed to respond, have you set your API key?"
-        )
-
-        yield get_json_line(error_packet.dict())
+        yield StreamingError(error="LLM failed to respond, have you set your API key?")
         return
 
     # Post-LLM answer processing
@@ -564,11 +570,24 @@ def stream_chat_message(
             gen_ai_response_message
         )
 
-        yield get_json_line(msg_detail_response.dict())
+        yield msg_detail_response
     except Exception as e:
         logger.exception(e)
 
         # Frontend will erase whatever answer and show this instead
-        error_packet = StreamingError(error="Failed to parse LLM output")
+        yield StreamingError(error="Failed to parse LLM output")
 
-        yield get_json_line(error_packet.dict())
+
+@log_generator_function_time()
+def stream_chat_message(
+    new_msg_req: CreateChatMessageRequest,
+    user: User | None,
+    db_session: Session,
+) -> Iterator[str]:
+    objects = stream_chat_message_objects(
+        new_msg_req=new_msg_req,
+        user=user,
+        db_session=db_session,
+    )
+    for obj in objects:
+        yield get_json_line(obj.dict())

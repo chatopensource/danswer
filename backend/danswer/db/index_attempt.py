@@ -115,9 +115,11 @@ def update_docs_indexed(
     index_attempt: IndexAttempt,
     total_docs_indexed: int,
     new_docs_indexed: int,
+    docs_removed_from_index: int,
 ) -> None:
     index_attempt.total_docs_indexed = total_docs_indexed
     index_attempt.new_docs_indexed = new_docs_indexed
+    index_attempt.docs_removed_from_index = docs_removed_from_index
 
     db_session.add(index_attempt)
     db_session.commit()
@@ -229,13 +231,24 @@ def expire_index_attempts(
     embedding_model_id: int,
     db_session: Session,
 ) -> None:
+    delete_query = (
+        delete(IndexAttempt)
+        .where(IndexAttempt.embedding_model_id == embedding_model_id)
+        .where(IndexAttempt.status == IndexingStatus.NOT_STARTED)
+    )
+    db_session.execute(delete_query)
+
     update_query = (
         update(IndexAttempt)
         .where(IndexAttempt.embedding_model_id == embedding_model_id)
         .where(IndexAttempt.status != IndexingStatus.SUCCESS)
-        .values(status=IndexingStatus.FAILED, error_msg="Embedding model swapped")
+        .values(
+            status=IndexingStatus.FAILED,
+            error_msg="Canceled due to embedding model swap",
+        )
     )
     db_session.execute(update_query)
+
     db_session.commit()
 
 

@@ -427,6 +427,7 @@ class IndexAttempt(Base):
     # The two below may be slightly out of sync if user switches Embedding Model
     new_docs_indexed: Mapped[int | None] = mapped_column(Integer, default=0)
     total_docs_indexed: Mapped[int | None] = mapped_column(Integer, default=0)
+    docs_removed_from_index: Mapped[int | None] = mapped_column(Integer, default=0)
     # only filled if status = "failed"
     error_msg: Mapped[str | None] = mapped_column(Text, default=None)
     # only filled if status = "failed" AND an unhandled exception caused the failure
@@ -715,6 +716,15 @@ class Prompt(Base):
     )
 
 
+class StarterMessage(TypedDict):
+    """NOTE: is a `TypedDict` so it can be used as a type hint for a JSONB column
+    in Postgres"""
+
+    name: str
+    description: str
+    message: str
+
+
 class Persona(Base):
     __tablename__ = "persona"
 
@@ -742,6 +752,9 @@ class Persona(Base):
     # auto-detected time filters, relevance filters, etc.
     llm_model_version_override: Mapped[str | None] = mapped_column(
         String, nullable=True
+    )
+    starter_messages: Mapped[list[StarterMessage] | None] = mapped_column(
+        postgresql.JSONB(), nullable=True
     )
     # Default personas are configured via backend during deployment
     # Treated specially (cannot be user edited etc.)
