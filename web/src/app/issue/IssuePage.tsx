@@ -268,37 +268,19 @@ const legalAnalysis: LegalAnalysisItem[] = [
 const aiTasks: AITask[] = [
   {
     id: 1,
-    description: 'Automate the analysis of financial documents to deliver insights faster than traditional methods.',
+    description: 'Send data request to finance department for local labor complicance verification.',
     type: 'dataRequest',
     status: 'pending',
   },
   {
     id: 2,
-    description: 'Apply AI to legal diligence processes to cut down time by 50% compared to standard review times.',
+    description: 'Schedule meeting with SolarVantage legal team to discuss contract clauses.',
     type: 'meetingSchedule',
     status: 'pending',
   },
   {
     id: 3,
-    description: 'Enhance patent examination by integrating AI cross-referencing to ensure no detail is missed.',
-    type: 'dataRequest',
-    status: 'pending',
-  },
-  {
-    id: 4,
-    description: 'Condense operational diligence expertise into hours using AI summarization techniques.',
-    type: 'dataRequest',
-    status: 'pending',
-  },
-  {
-    id: 5,
-    description: 'Expand deal screening capacity by 100% utilizing AI to identify better investment targets.',
-    type: 'dataRequest',
-    status: 'pending',
-  },
-  {
-    id: 6,
-    description: 'Accelerate the drafting of memos and presentations, achieving a 100% increase in speed with AI assistance.',
+    description: 'Generate investment memo based on issue findings.',
     type: 'memoCreation',
     status: 'pending',
   },
