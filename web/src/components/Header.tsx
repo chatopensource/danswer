@@ -9,6 +9,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { CustomDropdown, DefaultDropdownElement } from "./Dropdown";
 import { FiMessageSquare, FiSearch } from "react-icons/fi";
 import { usePathname } from "next/navigation";
+import { FaAddressBook, FaBook, FaLock } from "react-icons/fa";
+import { MdDashboard } from "react-icons/md";
 
 interface HeaderProps {
   user: User | null;
@@ -79,23 +81,36 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
           </div>
         </Link>
 
-        <Link href="/chat" className="h-full flex flex-col hover:bg-hover">
+        {/* <Link href="/chat" className="h-full flex flex-col hover:bg-hover">
           <div className="w-24 flex my-auto">
             <div className="mx-auto flex text-strong px-2">
               <FiMessageSquare className="my-auto mr-1" />
               <h1 className="flex text-sm font-bold my-auto">Chat</h1>
             </div>
           </div>
-        </Link>
+        </Link> */}
 
         <Link href="/dashboard" className="h-full flex flex-col hover:bg-hover">
           <div className="w-24 flex my-auto">
             <div className="mx-auto flex text-strong px-2">
-              <FiMessageSquare className="my-auto mr-1" />
+              <MdDashboard className="my-auto mr-1" />
               <h1 className="flex text-sm font-bold my-auto">Dashboard</h1>
             </div>
           </div>
         </Link>
+
+                <Link
+          href="/dataroom"
+          className={"ml-6 h-full flex flex-col hover:bg-hover"}
+        >
+          <div className="w-24 flex my-auto">
+            <div className={"mx-auto flex text-strong px-2"}>
+              <FaBook className="my-auto mr-1" />
+              <h1 className="flex text-sm font-bold my-auto">DataRooms</h1>
+            </div>
+          </div>
+        </Link>
+        
 
         <div className="ml-auto h-full flex flex-col">
           <div className="my-auto">

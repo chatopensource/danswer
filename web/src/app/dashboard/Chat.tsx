@@ -813,13 +813,6 @@ export const Chat = ({
               maxWidth={maxDocumentSidebarWidth || undefined}
             >
     <DocumentSidebar
-      selectedMessage={aiMessage}
-      selectedIssues={selectedIssues} // Updated to selectedIssues from selectedDocuments
-      toggleIssueSelection={toggleIssueSelection} // Updated to match the new prop name
-      clearSelectedIssues={clearSelectedIssues} // Updated to match the new prop name
-      selectedDocumentTokens={selectedDocumentTokens}
-      maxTokens={maxTokens}
-      isLoading={isFetchingChatMessages}
     />
             </ResizableSection>
           ) : // Another option is to use a div with the width set to the initial width, so that the

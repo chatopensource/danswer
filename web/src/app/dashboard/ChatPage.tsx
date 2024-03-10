@@ -107,7 +107,7 @@ export const CompanyInfo: React.FC<CompanyInfoProps> = ({ companyName, descripti
   return (
     <div className="company-info-section shadow-lg rounded-lg p-6">
       <div className="flex justify-between items-center">
-      <SectionHeader name="Company Overview" icon={FaBuilding} />
+      <SectionHeader name={`${companyName} Overview`} icon={FaBuilding} />
         {/* Status tag */}
         <span className={`status-tag text-sm font-semibold px-3 py-1 rounded-full ${statusColor}`}>
           {status}
@@ -216,9 +216,9 @@ export function ChatLayout({
 
   // You would also pass in the actual counts for closed issues, open data requests, etc.
   // For this example, we'll use arbitrary numbers
-  const closedIssuesCount = 5;
+  const closedIssuesCount = 11;
   const openDataRequestsCount = 3;
-  const priceIncreasesCount = 1;
+  const priceIncreasesCount = 2;
 
   return (
     <>

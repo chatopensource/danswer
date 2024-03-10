@@ -86,7 +86,6 @@ export function DocumentSidebar() {
               >
                   <ChatIssueDisplay
                   issue={issue}
-                  setPopup={() => {}} // Static display, no operation on popup
                 />
               </div>
             ))

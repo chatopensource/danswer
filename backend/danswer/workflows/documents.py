@@ -1,6 +1,6 @@
 EMPLOYMENT_CONTRACT = """EMPLOYMENT AGREEMENT
 This Employment Agreement (the “Agreement”) is effective as of January 6, 2004
-(the “Effective Date”) by and between Alex Mercer (the “Executive”) and PolarSunny, Inc., a
+(the “Effective Date”) by and between Alex Mercer (the “Executive”) and SolarVantage, Inc., a
 California corporation (the “Company”).
 1. Duties and Scope of Employment.
 (a) Position. For the term of this Agreement, the Company agrees to employ
@@ -274,7 +274,7 @@ IN WITNESS WHEREOF, each of the parties has executed this Agreement, in the case
 Company by its duly authorized officer, as of the day and year first above written.
 /s/ Alex Mercer
  ALEX MERCER
- POLARSUNNY, INC.
+ SOLARVANTAGE, INC.
 By: /s/ Mr. Greg Simmons
 Name: Mr. Greg Simmons
 Title: Chairman
