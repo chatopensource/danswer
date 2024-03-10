@@ -136,7 +136,7 @@ class SavedSearchDoc(SearchDoc):
 
     @classmethod
     def from_search_doc(
-        cls, search_doc: SearchDoc, db_doc_id: int = 0
+            cls, search_doc: SearchDoc, db_doc_id: int = 0
     ) -> "SavedSearchDoc":
         """IMPORTANT: careful using this and not providing a db_doc_id"""
         search_doc_data = search_doc.dict()

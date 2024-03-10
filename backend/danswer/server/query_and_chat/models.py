@@ -4,7 +4,7 @@ from typing import Any
 from pydantic import BaseModel
 from pydantic import root_validator
 
-from danswer.chat.models import RetrievalDocs
+from danswer.chat.models import RetrievalDocs, Issue, FoundIssues
 from danswer.configs.constants import DocumentSource
 from danswer.configs.constants import MessageType
 from danswer.configs.constants import SearchFeedbackType
@@ -150,6 +150,7 @@ class SearchFeedbackRequest(BaseModel):
         return values
 
 
+
 class ChatMessageDetail(BaseModel):
     message_id: int
     parent_message: int | None
@@ -161,6 +162,7 @@ class ChatMessageDetail(BaseModel):
     time_sent: datetime
     # Dict mapping citation number to db_doc_id
     citations: dict[int, int] | None
+    issues: FoundIssues | None
 
     def dict(self, *args: list, **kwargs: dict[str, Any]) -> dict[str, Any]:  # type: ignore
         initial_dict = super().dict(*args, **kwargs)  # type: ignore

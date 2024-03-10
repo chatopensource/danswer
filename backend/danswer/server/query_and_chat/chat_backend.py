@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from danswer.auth.users import current_user
 from danswer.chat.chat_utils import compute_max_document_tokens
 from danswer.chat.chat_utils import create_chat_chain
-from danswer.chat.process_message import stream_chat_message
+from danswer.chat.process_message import stream_chat_message, stream_chat_message_issue
 from danswer.db.chat import create_chat_session
 from danswer.db.chat import delete_chat_session
 from danswer.db.chat import get_chat_message
@@ -177,6 +177,32 @@ def handle_new_chat_message(
         raise HTTPException(status_code=400, detail="Empty chat message is invalid")
 
     packets = stream_chat_message(
+        new_msg_req=chat_message_req,
+        user=user,
+        db_session=db_session,
+    )
+
+    return StreamingResponse(packets, media_type="application/json")
+
+@router.post("/send-issue")
+def handle_new_chat_message_issue(
+    chat_message_req: CreateChatMessageRequest,
+    user: User | None = Depends(current_user),
+    db_session: Session = Depends(get_session),
+) -> StreamingResponse:
+    """This endpoint is both used for all the following purposes:
+    - Sending a new message in the session
+    - Regenerating a message in the session (just send the same one again)
+    - Editing a message (similar to regenerating but sending a different message)
+
+    To avoid extra overhead/latency, this assumes (and checks) that previous messages on the path
+    have already been set as latest"""
+    logger.info(f"Received new chat message: {chat_message_req.message}")
+
+    if not chat_message_req.message and chat_message_req.prompt_id is not None:
+        raise HTTPException(status_code=400, detail="Empty chat message is invalid")
+
+    packets = stream_chat_message_issue(
         new_msg_req=chat_message_req,
         user=user,
         db_session=db_session,

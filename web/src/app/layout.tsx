@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "ChatOpenSource",
+  title: "Mergify",
   description: "Question answering for your documents",
 };
 

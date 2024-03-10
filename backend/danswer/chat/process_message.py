@@ -68,14 +68,14 @@ logger = setup_logger()
 
 
 def generate_ai_chat_response(
-    query_message: ChatMessage,
-    history: list[ChatMessage],
-    persona: Persona,
-    context_docs: list[LlmDoc],
-    doc_id_to_rank_map: dict[str, int],
-    llm: LLM | None,
-    llm_tokenizer_encode_func: Callable,
-    all_doc_useful: bool,
+        query_message: ChatMessage,
+        history: list[ChatMessage],
+        persona: Persona,
+        context_docs: list[LlmDoc],
+        doc_id_to_rank_map: dict[str, int],
+        llm: LLM | None,
+        llm_tokenizer_encode_func: Callable,
+        all_doc_useful: bool,
 ) -> Iterator[DanswerAnswerPiece | CitationInfo | StreamingError]:
     if llm is None:
         try:
@@ -134,7 +134,7 @@ def generate_ai_chat_response(
 
 
 def translate_citations(
-    citations_list: list[CitationInfo], db_docs: list[DbSearchDoc]
+        citations_list: list[CitationInfo], db_docs: list[DbSearchDoc]
 ) -> dict[int, int]:
     """Always cites the first instance of the document_id, assumes the db_docs
     are sorted in the order displayed in the UI"""
@@ -155,15 +155,15 @@ def translate_citations(
 
 @log_generator_function_time()
 def stream_chat_message(
-    new_msg_req: CreateChatMessageRequest,
-    user: User | None,
-    db_session: Session,
-    # Needed to translate persona num_chunks to tokens to the LLM
-    default_num_chunks: float = MAX_CHUNKS_FED_TO_CHAT,
-    default_chunk_size: int = CHUNK_SIZE,
-    # For flow with search, don't include as many chunks as possible since we need to leave space
-    # for the chat history, for smaller models, we likely won't get MAX_CHUNKS_FED_TO_CHAT chunks
-    max_document_percentage: float = CHAT_TARGET_CHUNK_PERCENTAGE,
+        new_msg_req: CreateChatMessageRequest,
+        user: User | None,
+        db_session: Session,
+        # Needed to translate persona num_chunks to tokens to the LLM
+        default_num_chunks: float = MAX_CHUNKS_FED_TO_CHAT,
+        default_chunk_size: int = CHUNK_SIZE,
+        # For flow with search, don't include as many chunks as possible since we need to leave space
+        # for the chat history, for smaller models, we likely won't get MAX_CHUNKS_FED_TO_CHAT chunks
+        max_document_percentage: float = CHAT_TARGET_CHUNK_PERCENTAGE,
 ) -> Iterator[str]:
     """Streams in order:
     1. [conditional] Retrieved documents if a search needs to be run
@@ -321,7 +321,7 @@ def stream_chat_message(
                     return
 
                 final_doc_desired_length = tokens_per_doc[final_doc_ind] - (
-                    total_tokens - max_document_tokens
+                        total_tokens - max_document_tokens
                 )
                 # 75 tokens is a reasonable over-estimate of the metadata and title
                 final_doc_content_length = final_doc_desired_length - 75
@@ -572,3 +572,135 @@ def stream_chat_message(
         error_packet = StreamingError(error="Failed to parse LLM output")
 
         yield get_json_line(error_packet.dict())
+
+
+@log_generator_function_time()
+def stream_chat_message_issue(
+        new_msg_req: CreateChatMessageRequest,
+        user: User | None,
+        db_session: Session,
+        default_num_chunks: float = MAX_CHUNKS_FED_TO_CHAT,
+        default_chunk_size: int = CHUNK_SIZE,
+        max_document_percentage: float = CHAT_TARGET_CHUNK_PERCENTAGE,
+) -> Iterator[str]:
+    try:
+        user_id = user.id if user is not None else None
+        chat_session = get_chat_session_by_id(
+            chat_session_id=new_msg_req.chat_session_id,
+            user_id=user_id,
+            db_session=db_session,
+        )
+        message_text = new_msg_req.message
+        chat_session_id = new_msg_req.chat_session_id
+        parent_id = new_msg_req.parent_message_id
+        prompt_id = new_msg_req.prompt_id
+        reference_doc_ids = new_msg_req.search_doc_ids
+        persona = chat_session.persona
+        query_override = new_msg_req.query_override
+        reference_doc_ids = []
+        if reference_doc_ids is None:
+            raise RuntimeError(
+                "Must specify a set of documents for chat or specify search options"
+            )
+
+        llm = get_default_llm(
+            gen_ai_model_version_override=persona.llm_model_version_override
+        )
+        llm_tokenizer = get_default_llm_tokenizer()
+        llm_tokenizer_encode_func = cast(
+            Callable[[str], list[int]], llm_tokenizer.encode
+        )
+
+        # Every chat session begins with an empty root message
+        root_message = get_or_create_root_message(
+            chat_session_id=chat_session_id, db_session=db_session
+        )
+
+        if parent_id is not None:
+            parent_message = get_chat_message(
+                chat_message_id=parent_id,
+                user_id=user_id,
+                db_session=db_session,
+            )
+        else:
+            parent_message = root_message
+
+        # Create new message at the right place in the tree and update the parent's child pointer
+        new_user_message = create_new_chat_message(
+            chat_session_id=chat_session_id,
+            parent_message=parent_message,
+            prompt_id=prompt_id,
+            message=message_text,
+            token_count=len(llm_tokenizer_encode_func(message_text)),
+            message_type=MessageType.USER,
+            db_session=db_session,
+            commit=False,
+        )
+
+        # Create linear history of messages
+        final_msg, history_msgs = create_chat_chain(
+            chat_session_id=chat_session_id, db_session=db_session
+        )
+
+        if final_msg.id != new_user_message.id:
+            db_session.rollback()
+            raise RuntimeError(
+                "The new message was not on the mainline. "
+                "Be sure to update the chat pointers before calling this."
+            )
+
+        # Save now to save the latest chat message
+        db_session.commit()
+
+        run_search = False  # Searching is always false
+
+        # Logic for running searches has been removed since run_search is always false
+        # rephrased_query, llm_docs, etc., are no longer needed for searching logic and can be omitted or repurposed for other functionality
+
+        # If no prompt is provided, interpreted as not wanting an AI answer, save the retrieval results only
+        if final_msg.prompt is None:
+            gen_ai_response_message = create_new_chat_message(
+                chat_session_id=chat_session_id,
+                parent_message=new_user_message,
+                prompt_id=prompt_id,
+                message="",
+                token_count=0,
+                message_type=MessageType.ASSISTANT,
+                db_session=db_session,
+                commit=True,
+            )
+            msg_detail_response = translate_db_message_to_chat_message_detail(
+                gen_ai_response_message
+            )
+            yield get_json_line(msg_detail_response.dict())
+            return
+
+        # LLM prompt building, response capturing, etc.
+        response_packets = generate_ai_chat_response(
+            query_message=final_msg,
+            history=history_msgs,
+            persona=persona,
+            context_docs=[],
+            doc_id_to_rank_map={},
+            llm=llm,
+            llm_tokenizer_encode_func=llm_tokenizer_encode_func,
+            all_doc_useful=reference_doc_ids is not None,
+        )
+
+        # Capture outputs and errors
+        llm_output = ""
+        error: str | None = None
+        for packet in response_packets:
+            if isinstance(packet, DanswerAnswerPiece):
+                token = packet.answer_piece
+                if token:
+                    llm_output += token
+            elif isinstance(packet, StreamingError):
+                error = packet.error
+
+            yield get_json_line(packet.dict())
+    except Exception as e:
+        logger.exception(e)
+        error_packet = StreamingError(
+            error="LLM failed to respond, have you set your API key?"
+        )

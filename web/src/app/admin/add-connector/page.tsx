@@ -49,8 +49,8 @@ export default function Page() {
       />
 
       <Text>
-        Connect ChatOpenSource to your organization&apos;s knowledge sources.
-        We&apos;ll automatically sync your data into ChatOpenSource, so you can find
+        Connect Mergify to your organization&apos;s knowledge sources.
+        We&apos;ll automatically sync your data into Mergify, so you can find
         exactly what you&apos;re looking for in one place.
       </Text>
 

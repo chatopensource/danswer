@@ -102,9 +102,20 @@ class QAResponse(SearchResponse, DanswerAnswer):
 
 AnswerQuestionStreamReturn = Iterator[
     DanswerAnswerPiece | DanswerQuotes | DanswerContexts | StreamingError
-]
+    ]
 
 
 class LLMMetricsContainer(BaseModel):
     prompt_tokens: int
     response_tokens: int
+
+
+class Issue(BaseModel):
+    issue_id: int
+    severity: str
+    reasoning: str
+    immediateRecommendation: str
+
+
+class FoundIssues(BaseModel):
+    top_issues: list[Issue]

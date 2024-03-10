@@ -142,8 +142,8 @@ export const SlackBotCreationForm = ({
               const errorMsg = responseJson.detail || responseJson.message;
               setPopup({
                 message: isUpdate
-                  ? `Error updating ChatOSBot config - ${errorMsg}`
-                  : `Error creating ChatOSBot config - ${errorMsg}`,
+                  ? `Error updating Mergify config - ${errorMsg}`
+                  : `Error creating Mergify config - ${errorMsg}`,
                 type: "error",
               });
             }
@@ -165,7 +165,7 @@ export const SlackBotCreationForm = ({
                       &apos;#ask-chatopensource&apos;.
                       <br />
                       <br />
-                      <i>NOTE</i>: you still need to add ChatOSBot to the
+                      <i>NOTE</i>: you still need to add Mergify to the
                       channel(s) in Slack itself. Setting this config will not
                       auto-add the bot to the channel.
                     </div>
@@ -173,7 +173,7 @@ export const SlackBotCreationForm = ({
                 />
                 <Divider />
 
-                <SectionHeader>When should ChatOSBot respond?</SectionHeader>
+                <SectionHeader>When should Mergify respond?</SectionHeader>
 
                 <BooleanFormField
                   name="answer_validity_check_enabled"
@@ -187,22 +187,22 @@ export const SlackBotCreationForm = ({
                 />
                 <BooleanFormField
                   name="respond_tag_only"
-                  label="Respond to @ChatOSBot Only"
-                  subtext="If set, ChatOSBot will only respond when directly tagged"
+                  label="Respond to @Mergify Only"
+                  subtext="If set, Mergify will only respond when directly tagged"
                 />
                 <BooleanFormField
                   name="respond_to_bots"
                   label="Responds to Bot messages"
-                  subtext="If not set, ChatOSBot will always ignore messages from Bots"
+                  subtext="If not set, Mergify will always ignore messages from Bots"
                 />
                 <TextArrayField
                   name="respond_team_member_list"
                   label="Team Members Emails"
-                  subtext={`If specified, ChatOSBot responses will only be 
+                  subtext={`If specified, Mergify responses will only be 
                   visible to members in this list. This is
-                  useful if you want ChatOSBot to operate in an
+                  useful if you want Mergify to operate in an
                   "assistant" mode, where it helps the team members find
-                  answers, but let's them build on top of ChatOSBot's response / throw 
+                  answers, but let's them build on top of Mergify's response / throw 
                   out the occasional incorrect answer.`}
                   values={values}
                 />
@@ -212,8 +212,8 @@ export const SlackBotCreationForm = ({
 
                 <BooleanFormField
                   name="still_need_help_enabled"
-                  label="Should ChatOpenSource give a “Still need help?” button?"
-                  subtext={`If specified, ChatOSBot's response will include a button at the bottom 
+                  label="Should Mergify give a “Still need help?” button?"
+                  subtext={`If specified, Mergify's response will include a button at the bottom 
                   of the response that asks the user if they still need help.`}
                 />
                 {values.still_need_help_enabled && (
@@ -228,7 +228,7 @@ export const SlackBotCreationForm = ({
                         button. For example, &apos;mark@acme.com&apos;.
                         <br />
                         Or provide a user group by either the name or the
-                        handle. For example, &apos;ChatOpenSource Team&apos; or
+                        handle. For example, &apos;Mergify Team&apos; or
                         &apos;chatopensource-team&apos;.
                         <br />
                         <br />
@@ -247,7 +247,7 @@ export const SlackBotCreationForm = ({
                   </SectionHeader>
                   <Text>
                     Use either a Persona <b>or</b> Document Sets to control how
-                    ChatOSBot answers.
+                    Mergify answers.
                   </Text>
                   <Text>
                     <ul className="list-disc mt-2 ml-4">
@@ -257,7 +257,7 @@ export const SlackBotCreationForm = ({
                       </li>
                       <li>
                         You should use Document Sets if you just want to control
-                        which documents ChatOSBot uses as references.
+                        which documents Mergify uses as references.
                       </li>
                     </ul>
                   </Text>
@@ -285,8 +285,8 @@ export const SlackBotCreationForm = ({
                           <div>
                             <div>
                               <SubLabel>
-                                The document sets that ChatOSBot should search
-                                through. If left blank, ChatOSBot will search
+                                The document sets that Mergify should search
+                                through. If left blank, Mergify will search
                                 through all documents.
                               </SubLabel>
                             </div>

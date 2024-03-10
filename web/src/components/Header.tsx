@@ -62,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
               <Image src="/logo.png" alt="Logo" width="1419" height="1520" />
             </div>
             <h1 className="flex text-2xl text-strong font-bold my-auto">
-                  ChatOpenSource
+                  Mergify
             </h1>
           </div>
         </Link>
@@ -84,6 +84,15 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
             <div className="mx-auto flex text-strong px-2">
               <FiMessageSquare className="my-auto mr-1" />
               <h1 className="flex text-sm font-bold my-auto">Chat</h1>
+            </div>
+          </div>
+        </Link>
+
+        <Link href="/workflow" className="h-full flex flex-col hover:bg-hover">
+          <div className="w-24 flex my-auto">
+            <div className="mx-auto flex text-strong px-2">
+              <FiMessageSquare className="my-auto mr-1" />
+              <h1 className="flex text-sm font-bold my-auto">Workflow</h1>
             </div>
           </div>
         </Link>
