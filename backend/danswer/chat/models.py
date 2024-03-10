@@ -111,6 +111,7 @@ class LLMMetricsContainer(BaseModel):
 
 
 class Issue(BaseModel):
+    document_type:str
     issue_id: int
     severity: str
     reasoning: str

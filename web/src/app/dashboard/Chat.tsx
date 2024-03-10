@@ -539,14 +539,14 @@ export const Chat = ({
                 !isFetchingChatMessages &&
                 !isStreaming && (
                   <ChatIntro
-                    availableSources={finalAvailableSources}
-                    availablePersonas={availablePersonas}
-                    selectedPersona={selectedPersona}
-                    handlePersonaSelect={(persona) => {
-                      setSelectedPersona(persona);
-                      textareaRef.current?.focus();
-                      router.push(`/chat?personaId=${persona.id}`);
-                    }}
+                    // availableSources={finalAvailableSources}
+                    // availablePersonas={availablePersonas}
+                    // selectedPersona={selectedPersona}
+                    // handlePersonaSelect={(persona) => {
+                    //   setSelectedPersona(persona);
+                    //   textareaRef.current?.focus();
+                    //   router.push(`/chat?personaId=${persona.id}`);
+                    // }}
                   />
                 )}
 

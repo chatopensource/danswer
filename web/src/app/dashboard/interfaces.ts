@@ -68,6 +68,7 @@ export interface StreamingError {
 }
 
 export interface Issue {
+  document_type: string
   issue_id: number;
   severity:string;
   reasoning: string;

@@ -63,6 +63,8 @@ from danswer.server.query_and_chat.models import CreateChatMessageRequest
 from danswer.server.utils import get_json_line
 from danswer.utils.logger import setup_logger
 from danswer.utils.timing import log_generator_function_time
+from danswer.workflows.documents import EMPLOYMENT_CONTRACT
+from danswer.workflows.issues import EMPLOYMENT_ISSUES, EMPLOYMENT_ISSUES_STRING
 
 logger = setup_logger()
 
@@ -127,6 +129,47 @@ def generate_ai_chat_response(
         yield from extract_citations_from_stream(
             tokens, context_docs, doc_id_to_rank_map
         )
+
+    except Exception as e:
+        logger.exception(f"LLM failed to produce valid chat message, error: {e}")
+        yield StreamingError(error=str(e))
+
+
+def generate_ai_chat_response_issue(
+    query_message: ChatMessage,
+    history: list[ChatMessage],
+    persona: Persona,
+    context_docs: list[LlmDoc],
+    doc_id_to_rank_map: dict[str, int],
+    llm: LLM | None,
+    all_doc_useful: bool,
+) -> Iterator[DanswerAnswerPiece | CitationInfo | StreamingError]:
+    if llm is None:
+        try:
+            llm = get_default_llm()  # Ensure this function is defined elsewhere
+        except GenAIDisabledException:
+            yield DanswerAnswerPiece(answer_piece=DISABLED_GEN_AI_MSG)
+            return
+
+    prompt = f"""You are an assistant to an MD at a PE firm and know everything about the deep due diligence process 
+    and how important accuracy is. You sit down, take a deep breath, and You are given a document along with a list 
+    of issues flagged about that document, and a question. The question should be about a single issue, 
+    so don't reference the other issues unless relevant. Answer the question given the issue summary and the source 
+    document.
+    
+    Document:{EMPLOYMENT_CONTRACT}
+    
+    Issues: {[EMPLOYMENT_ISSUES_STRING]}
+    
+    Question: {query_message.message}
+    
+    
+    """  # Construct your prompt from the input parameters as needed""
+
+    try:
+        for token in llm.stream(prompt):
+            # Since tokens are already strings, directly yield them
+            yield DanswerAnswerPiece(answer_piece=token)
 
     except Exception as e:
         logger.exception(f"LLM failed to produce valid chat message, error: {e}")
@@ -676,14 +719,13 @@ def stream_chat_message_issue(
             return
 
         # LLM prompt building, response capturing, etc.
-        response_packets = generate_ai_chat_response(
+        response_packets = generate_ai_chat_response_issue(
             query_message=final_msg,
             history=history_msgs,
             persona=persona,
             context_docs=[],
             doc_id_to_rank_map={},
             llm=llm,
-            llm_tokenizer_encode_func=llm_tokenizer_encode_func,
             all_doc_useful=reference_doc_ids is not None,
         )
 

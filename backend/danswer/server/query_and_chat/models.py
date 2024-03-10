@@ -150,7 +150,6 @@ class SearchFeedbackRequest(BaseModel):
         return values
 
 
-
 class ChatMessageDetail(BaseModel):
     message_id: int
     parent_message: int | None
@@ -162,7 +161,8 @@ class ChatMessageDetail(BaseModel):
     time_sent: datetime
     # Dict mapping citation number to db_doc_id
     citations: dict[int, int] | None
-    issues: FoundIssues | None
+
+    # issues: FoundIssues | None
 
     def dict(self, *args: list, **kwargs: dict[str, Any]) -> dict[str, Any]:  # type: ignore
         initial_dict = super().dict(*args, **kwargs)  # type: ignore

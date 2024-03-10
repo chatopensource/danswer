@@ -12,7 +12,7 @@ export interface Option<T> {
 
 export type StringOrNumberOption = Option<string | number>;
 
-interface DropdownProps<T> {
+export interface DropdownProps<T> {
   options: Option<T>[];
   selected: string;
   onSelect: (selected: Option<T> | null) => void;

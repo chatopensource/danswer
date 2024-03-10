@@ -88,11 +88,11 @@ export const Header: React.FC<HeaderProps> = ({ user }) => {
           </div>
         </Link>
 
-        <Link href="/workflow" className="h-full flex flex-col hover:bg-hover">
+        <Link href="/dashboard" className="h-full flex flex-col hover:bg-hover">
           <div className="w-24 flex my-auto">
             <div className="mx-auto flex text-strong px-2">
               <FiMessageSquare className="my-auto mr-1" />
-              <h1 className="flex text-sm font-bold my-auto">Workflow</h1>
+              <h1 className="flex text-sm font-bold my-auto">Dashboard</h1>
             </div>
           </div>
         </Link>
