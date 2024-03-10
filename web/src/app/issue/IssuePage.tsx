@@ -265,26 +265,6 @@ const legalAnalysis: LegalAnalysisItem[] = [
   }
 ];
 
-const aiTasks: AITask[] = [
-  {
-    id: 1,
-    description: 'Send data request to finance department for local labor complicance verification.',
-    type: 'dataRequest',
-    status: 'pending',
-  },
-  {
-    id: 2,
-    description: 'Schedule meeting with SolarVantage legal team to discuss contract clauses.',
-    type: 'meetingSchedule',
-    status: 'pending',
-  },
-  {
-    id: 3,
-    description: 'Generate investment memo based on issue findings.',
-    type: 'memoCreation',
-    status: 'pending',
-  },
-];
 
 
 
@@ -415,7 +395,7 @@ export function IssueLayout({
   // Assuming resolution data is fetched or available in your component
   const resolution = issueResolutions.find(res => res.issue_id === issue_id);
 
-  return (
+return (
     <>
       <div className="bg-gray-100 p-5">
         <Header user={user} />
@@ -423,34 +403,36 @@ export function IssueLayout({
         <ApiKeyModal />
         <InstantSSRAutoRefresh />
 
-        <div className="container grid-cols-1 lg:grid-cols-12 gap-2 items-start">
-          {/* IssueOverview box */}
-
-          {/* Other ContentBoxes like LegalAnalysis and ResolutionLog... */}
-          {/* ContentBox for LegalAnalysis, taking full width on mobile, half on larger screens */}
-          <ContentBox width="w-full" height="auto" className="bg-white p-6 rounded-lg shadow-lg lg:col-span-6">
+        <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+          {/* ContentBox for LegalAnalysis */}
+          <ContentBox width="lg:w-full" height="auto" className="bg-white p-6 rounded-lg shadow-lg">
             <LegalAnalysisDetail issueId={issue_id} />
           </ContentBox>
 
-          {/* Placeholder for FinancialAnalysis */}
-          {/* <ContentBox width="w-full" height="auto" className="bg-white p-6 rounded-lg shadow-lg lg:col-span-6">
-            <FinancialAnalysis issueId={issue_id} />
-          </ContentBox> */}
           {/* AIAutomationTasks ContentBox */}
-          <AIAutomationTasks issueId={issue_id} tasks={aiTasks}/>
+          <ContentBox width="lg:w-full" height="auto" className="bg-white p-6 rounded-lg shadow-lg">
+            <AIAutomationTasks issueId={issue_id}/>
+          </ContentBox>
+
+          {/* ContentBox for FinancialAnalysis */}
+          {/* Make sure FinancialAnalysis component is defined */}
+          {/* <ContentBox width="lg:w-full" height="auto" className="bg-white p-6 rounded-lg shadow-lg">
+            <FinancialAnalysis financialImpacts={...} />
+          </ContentBox> */}
 
           {/* Resolution Tracking Box */}
-        {resolution && (
-          <ContentBox width="w-full" height="auto" className="bg-white p-6 rounded-lg shadow-lg lg:col-span-6">
-            <ResolutionLog actions={resolution.actions} assignments={resolution.assignments} />
-            {/* Integrate other components like StatusTimeline and AssignmentManager as needed */}
-          </ContentBox>
-        )}
-          <ContentBox width="w-full" height="auto" className="bg-white p-6 rounded-lg shadow-lg lg:col-span-6">
+          {resolution && (
+            <ContentBox width="lg:w-full" height="auto" className="bg-white p-6 rounded-lg shadow-lg">
+              <ResolutionLog actions={resolution.actions} assignments={resolution.assignments} />
+            </ContentBox>
+          )}
+
+          {/* IssueOverview ContentBox */}
+          <ContentBox width="lg:w-full" height="auto" className="bg-white p-6 rounded-lg shadow-lg">
             <IssueOverview issueId={issue_id} />
           </ContentBox>
-          </div>
         </div>
+      </div>
     </>
   );
 }
