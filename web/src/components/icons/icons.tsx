@@ -51,6 +51,10 @@ import document360Icon from "../../../public/Document360.png";
 import googleSitesIcon from "../../../public/GoogleSites.png";
 import zendeskIcon from "../../../public/Zendesk.svg";
 import sharepointIcon from "../../../public/Sharepoint.png";
+import boxIcon from '../../../public/box.png';
+import datasiteIcon from '../../../public/datasite logo.png';
+import idealsIcon from '../../../public/iDeals_logo.png';
+
 import { FaRobot } from "react-icons/fa";
 
 interface IconProps {
@@ -592,3 +596,45 @@ export const ZendeskIcon = ({
     <Image src={zendeskIcon} alt="Logo" width="96" height="96" />
   </div>
 );
+
+export const BoxIcon = ({
+  size = 16,
+  className = defaultTailwindCSS,
+}: IconProps) => {
+  return (
+    <div
+      style={{ width: `${size}px`, height: `${size}px` }}
+      className={`w-[${size}px] h-[${size}px] ` + className}
+    >
+      <Image src={boxIcon} alt="Box Logo" width="96" height="96" />
+    </div>
+  );
+};
+
+export const DatasiteIcon = ({
+  size = 16,
+  className = defaultTailwindCSS,
+}: IconProps) => {
+  return (
+    <div
+      style={{ width: `${size}px`, height: `${size}px` }}
+      className={`w-[${size}px] h-[${size}px] ` + className}
+    >
+      <Image src={datasiteIcon} alt="Datasite Logo" width="96" height="96" />
+    </div>
+  );
+};
+
+export const IDealsIcon = ({
+  size = 16,
+  className = defaultTailwindCSS,
+}: IconProps) => {
+  return (
+    <div
+      style={{ width: `${size}px`, height: `${size}px` }}
+      className={`w-[${size}px] h-[${size}px] ` + className}
+    >
+      <Image src={idealsIcon} alt="iDeals Logo" width="96" height="96" />
+    </div>
+  );
+};
