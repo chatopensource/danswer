@@ -53,23 +53,23 @@ logger = setup_logger()
 
 
 def stream_answer_objects(
-    query_req: DirectQARequest,
-    user: User | None,
-    # These need to be passed in because in Web UI one shot flow,
-    # we can have much more document as there is no history.
-    # For Slack flow, we need to save more tokens for the thread context
-    max_document_tokens: int | None,
-    max_history_tokens: int | None,
-    db_session: Session,
-    # Needed to translate persona num_chunks to tokens to the LLM
-    default_num_chunks: float = MAX_CHUNKS_FED_TO_CHAT,
-    default_chunk_size: int = CHUNK_SIZE,
-    timeout: int = QA_TIMEOUT,
-    bypass_acl: bool = False,
-    retrieval_metrics_callback: Callable[[RetrievalMetricsContainer], None]
-    | None = None,
-    rerank_metrics_callback: Callable[[RerankMetricsContainer], None] | None = None,
-    llm_metrics_callback: Callable[[LLMMetricsContainer], None] | None = None,
+        query_req: DirectQARequest,
+        user: User | None,
+        # These need to be passed in because in Web UI one shot flow,
+        # we can have much more document as there is no history.
+        # For Slack flow, we need to save more tokens for the thread context
+        max_document_tokens: int | None,
+        max_history_tokens: int | None,
+        db_session: Session,
+        # Needed to translate persona num_chunks to tokens to the LLM
+        default_num_chunks: float = MAX_CHUNKS_FED_TO_CHAT,
+        default_chunk_size: int = CHUNK_SIZE,
+        timeout: int = QA_TIMEOUT,
+        bypass_acl: bool = False,
+        retrieval_metrics_callback: Callable[[RetrievalMetricsContainer], None]
+                                    | None = None,
+        rerank_metrics_callback: Callable[[RerankMetricsContainer], None] | None = None,
+        llm_metrics_callback: Callable[[LLMMetricsContainer], None] | None = None,
 ) -> Iterator[
     QueryRephrase
     | QADocsResponse
@@ -79,7 +79,7 @@ def stream_answer_objects(
     | DanswerContexts
     | StreamingError
     | ChatMessageDetail
-]:
+    ]:
     """Streams in order:
     1. [always] Retrieved documents, stops flow if nothing is found
     2. [conditional] LLM selected chunk indices if LLM chunk filtering is turned on
@@ -304,11 +304,11 @@ def stream_answer_objects(
 
 @log_generator_function_time()
 def stream_search_answer(
-    query_req: DirectQARequest,
-    user: User | None,
-    max_document_tokens: int | None,
-    max_history_tokens: int | None,
-    db_session: Session,
+        query_req: DirectQARequest,
+        user: User | None,
+        max_document_tokens: int | None,
+        max_history_tokens: int | None,
+        db_session: Session,
 ) -> Iterator[str]:
     objects = stream_answer_objects(
         query_req=query_req,
@@ -322,18 +322,18 @@ def stream_search_answer(
 
 
 def get_search_answer(
-    query_req: DirectQARequest,
-    user: User | None,
-    max_document_tokens: int | None,
-    max_history_tokens: int | None,
-    db_session: Session,
-    answer_generation_timeout: int = QA_TIMEOUT,
-    enable_reflexion: bool = False,
-    bypass_acl: bool = False,
-    retrieval_metrics_callback: Callable[[RetrievalMetricsContainer], None]
-    | None = None,
-    rerank_metrics_callback: Callable[[RerankMetricsContainer], None] | None = None,
-    llm_metrics_callback: Callable[[LLMMetricsContainer], None] | None = None,
+        query_req: DirectQARequest,
+        user: User | None,
+        max_document_tokens: int | None,
+        max_history_tokens: int | None,
+        db_session: Session,
+        answer_generation_timeout: int = QA_TIMEOUT,
+        enable_reflexion: bool = False,
+        bypass_acl: bool = False,
+        retrieval_metrics_callback: Callable[[RetrievalMetricsContainer], None]
+                                    | None = None,
+        rerank_metrics_callback: Callable[[RerankMetricsContainer], None] | None = None,
+        llm_metrics_callback: Callable[[LLMMetricsContainer], None] | None = None,
 ) -> OneShotQAResponse:
     """Collects the streamed one shot answer responses into a single object"""
     qa_response = OneShotQAResponse()
