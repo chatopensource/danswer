@@ -31,10 +31,15 @@ export function ChatIssueDisplay({ issue, onResolve }: IssueDisplayProps) {
   const handleResolve = () => {
     setIsResolving(true);
     setTimeout(() => {
-      onResolve(issue.issue_id);
+      if (typeof onResolve === 'function') { // Check if onResolve is a function
+        onResolve(issue.issue_id);
+      } else {
+        console.error('onResolve is not a function. Please pass a valid function as the onResolve prop.');
+      }
       setIsResolving(false);
     }, 1000); // Simulates an async operation
   };
+
 
   const buttonStyle = {
     padding: '8px 16px',
