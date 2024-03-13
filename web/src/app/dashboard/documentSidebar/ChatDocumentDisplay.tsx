@@ -65,6 +65,9 @@ export function ChatIssueDisplay({ issue, onResolve }: IssueDisplayProps) {
         <div><strong>Recommendation:</strong> {issue.immediateRecommendation}</div>
       </div>
       <div>
+          <button style={{ ...buttonStyle, backgroundColor: '#30B5B5' }}>
+            Cross Reference
+          </button>
         <Link href={`/issue/${issue.issue_id}`}>
           <button style={{ ...buttonStyle, backgroundColor: '#0d6efd' }}>
             Details
