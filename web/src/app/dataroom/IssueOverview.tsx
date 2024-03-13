@@ -8,49 +8,49 @@ interface IssueOverviewItem {
 const issueOverviews: IssueOverviewItem[] = [
   {
     issue_id: 1,
-    summary: "This issue pertains to the enforceability of Non-Competition and Confidentiality Clauses in SolarVantage's standard Employment Agreement.",
+    summary: "SolarVantage",
     fullTextLink: "/documents/employment-agreement.pdf#section6",
-    tags: ['legal', 'employment']
+    tags: ['eployment', 'legal', 'confidentiality', 'non-competition']
   },
   {
     issue_id: 2,
-    summary: "This issue relates to ensuring the at-will employment clause in section 4(b) of the Employment Agreement is consistent with local labor laws.",
+    summary: "ECorp",
     fullTextLink: "/documents/employment-agreement.pdf#section4b",
     tags: ['legal', 'labor', 'compliance']
   },
   {
     issue_id: 3,
-    summary: "This issue involves analyzing the financial implications of Termination Benefits and Severance Pay as outlined in the Employment Agreement.",
+    summary: "Hooli",
     fullTextLink: "/documents/employment-agreement.pdf#section5b",
     tags: ['financial', 'employment', 'benefits']
   },
   {
     issue_id: 4,
-    summary: "This issue focuses on evaluating the implications of change of control provisions on the company's obligations in the event of a merger or acquisition.",
+    summary: "Pied Piper",
     fullTextLink: "/documents/employment-agreement.pdf#section7a",
     tags: ['legal', 'corporate', 'ma']
   },
   {
     issue_id: 5,
-    summary: "This issue considers the legal and operational implications of arbitration venue specificity in the Employment Agreement.",
+    summary: "Goolybib",
     fullTextLink: "/documents/employment-agreement.pdf#section8g",
     tags: ['legal', 'arbitration']
   },
   {
     issue_id: 6,
-    summary: "This issue examines the scope and limitations of indemnification clauses in the Employment Agreement.",
+    summary: "Aviato",
     fullTextLink: "/documents/employment-agreement.pdf#section9",
     tags: ['legal', 'indemnification']
   },
   {
     issue_id: 7,
-    summary: "This issue evaluates the intellectual property provisions in the Employment Agreement, including ownership and assignment of inventions.",
+    summary: "AllSafe Cybersecurity",
     fullTextLink: "/documents/employment-agreement.pdf#section10",
     tags: ['legal', 'ip', 'inventions']
   },
   {
     issue_id: 8,
-    summary: "This issue analyzes the termination for cause provisions in the Employment Agreement and their potential impact on the company.",
+    summary: "ChatOpenSource",
     fullTextLink: "/documents/employment-agreement.pdf#section11",
     tags: ['legal', 'employment', 'termination']
   }
@@ -83,12 +83,12 @@ export const IssueOverview: React.FC = () => { // Removed issueId prop as it's n
       {issueOverviews.map((overview, index) => (
         <div key={index} className="p-6 border-l-4 border-yellow-400 bg-white rounded-lg shadow mb-4">
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Issue Overview
+            Dataroom
           </h3>
           <p className="text-gray-700 mb-4">{overview.summary}</p>
           <a href={overview.fullTextLink}
              className="text-blue-600 hover:text-blue-800 hover:underline mb-4">
-            Read the full text
+            Go to Dataroom Dashboard
           </a>
           <div className="mt-4">
             {overview.tags.map((tag, tagIndex) => {

@@ -3,10 +3,14 @@ from fastapi import APIRouter
 from danswer.db.models import User
 from danswer.server.workflows.models import DocumentComparisonResult
 from danswer.utils.logger import setup_logger
-import openai
 import fitz  # PyMuPDF
+import os
+from openai import OpenAI
 
-openai.api_key = 'your_openai_api_key_here'
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key='',
+)
 
 # Assuming the `workflows` router is already defined somewhere in your code.
 # If not, you would define it like so:
@@ -46,7 +50,7 @@ async def compare_documents_endpoint(
 
         return DocumentComparisonResult(comparison=comparison_result, red_flags=red_flags)
     except Exception as e:
-        logger.error(f"Error comparing documents: {str(e)}")
+        print(f"Error comparing documents: {str(e)}")
         raise HTTPException(status_code=500, detail="Error processing document comparison.")
 
 
@@ -61,21 +65,29 @@ def extract_text_from_pdf(pdf_bytes: bytes) -> str:
     return text
 
 
+import openai
+
+
 def analyze_documents_with_openai(content1: str, content2: str) -> (str, list):
     """
-    Uses OpenAI's API to compare two documents and identify differences and potential legal red flags.
+    Uses OpenAI's Chat API to compare two documents and identify differences and potential legal red flags.
+    This version is updated to use the ChatGPT with a large context window for a more detailed analysis.
     """
     prompt = f"Compare the following two documents and highlight differences and potential legal red flags:\n\nDocument 1:\n{content1}\n\nDocument 2:\n{content2}"
 
-    response = openai.Completion.create(
-        engine="text-davinci-003",  # Choose an appropriate engine for your use case
-        prompt=prompt,
-        temperature=0.5,
-        max_tokens=1024,  # Adjust based on your needs
-        stop=None
+    response = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": "You are a highly knowledgeable legal advisor."},
+            {"role": "user", "content": prompt}
+        ],
+        model="gpt-4-32k",
+        temperature=0.0,
+        max_tokens=3000  # Adjust based on your needs and the limits of the model
     )
 
-    comparison_result = response.choices[0].text.strip()
+    # Ensure to parse the response correctly based on the ChatGPT structure
+    print(response.choices[0].message.content)
+    comparison_result = response.choices[0].message.content
     red_flags = ["Identify specific red flags based on the analysis."]
 
     return comparison_result, red_flags

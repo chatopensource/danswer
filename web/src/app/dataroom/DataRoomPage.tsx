@@ -349,7 +349,7 @@ const LegalAnalysisDetail: React.FC<LegalAnalysisProps> = ({ issueId }) => {
   if (!analysis) {
     return (
       <div className="p-6 border border-gray-200 rounded-lg shadow bg-white">
-        <p className="text-gray-700">No legal analysis found for this issue.</p>
+        <p className="text-gray-700"><b>Dataroom Status Overviews</b></p>
       </div>
     );
   }
