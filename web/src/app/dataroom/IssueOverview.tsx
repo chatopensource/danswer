@@ -60,17 +60,7 @@ export interface IssueOverviewProps {
   issueId: number;
 }
 
-export const IssueOverview: React.FC<IssueOverviewProps> = ({ issueId }) => {
-  const overview = issueOverviews.find(item => item.issue_id === issueId);
-
-  if (!overview) {
-    return (
-      <div className="p-6 border border-gray-200 rounded-lg shadow bg-white">
-        <p className="text-gray-700">No issue overview available.</p>
-      </div>
-    );
-  }
-
+export const IssueOverview: React.FC = () => { // Removed issueId prop as it's no longer needed
   // Define the styles for tags based on type
   const tagStyles = {
     legal: {
@@ -89,25 +79,29 @@ export const IssueOverview: React.FC<IssueOverviewProps> = ({ issueId }) => {
   };
 
   return (
-    <div className="p-6 border-l-4 border-yellow-400 bg-white rounded-lg shadow">
-      <h3 className="text-lg font-medium text-gray-900 mb-2">
-        Issue Overview
-      </h3>
-      <p className="text-gray-700 mb-4">{overview.summary}</p>
-      <a href={overview.fullTextLink}
-         className="text-blue-600 hover:text-blue-800 hover:underline mb-4">
-        Read the full text
-      </a>
-      <div className="mt-4">
-        {overview.tags.map((tag, index) => {
-          const style = tagStyles[tag as keyof typeof tagStyles] || {};
-          return (
-            <span key={index} style={{ ...style, fontWeight: 'bold', padding: '4px 8px', borderRadius: '8px', marginRight: '8px', display: 'inline-block' }}>
-              {tag.charAt(0).toUpperCase() + tag.slice(1)}
-            </span>
-          );
-        })}
-      </div>
-    </div>
+    <>
+      {issueOverviews.map((overview, index) => (
+        <div key={index} className="p-6 border-l-4 border-yellow-400 bg-white rounded-lg shadow mb-4">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Issue Overview
+          </h3>
+          <p className="text-gray-700 mb-4">{overview.summary}</p>
+          <a href={overview.fullTextLink}
+             className="text-blue-600 hover:text-blue-800 hover:underline mb-4">
+            Read the full text
+          </a>
+          <div className="mt-4">
+            {overview.tags.map((tag, tagIndex) => {
+              const style = tagStyles[tag as keyof typeof tagStyles] || {};
+              return (
+                <span key={tagIndex} style={{ ...style, fontWeight: 'bold', padding: '4px 8px', borderRadius: '8px', marginRight: '8px', display: 'inline-block' }}>
+                  {tag.charAt(0).toUpperCase() + tag.slice(1)}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </>
   );
 };

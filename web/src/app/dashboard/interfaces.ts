@@ -73,5 +73,6 @@ export interface Issue {
   severity:string;
   reasoning: string;
   immediateRecommendation: string;
+  resolvingStatus?: 'pending' | 'processing' | 'resolved'; // Add this line
 
 }

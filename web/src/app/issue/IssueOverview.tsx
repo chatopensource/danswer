@@ -66,7 +66,7 @@ export const IssueOverview: React.FC<IssueOverviewProps> = ({ issueId }) => {
   if (!overview) {
     return (
       <div className="p-6 border border-gray-200 rounded-lg shadow bg-white">
-        <p className="text-gray-700">No issue overview available.</p>
+        <p className="text-gray-700">No issue overview available 1.</p>
       </div>
     );
   }
